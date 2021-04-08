@@ -1,4 +1,5 @@
 import math
+import pandas as pd
 from scipy import stats
 import matplotlib.pyplot as plt
 import operator
@@ -31,7 +32,7 @@ Standmenge_stdv_perc= st.slider("Wähle die Standardabweichung der Standmenge in
 Standmenge_stdv = Standmenge_stdv_perc * Standmenge_durch
 
 Werkzeugkosten = st.number_input("Wähle den Werkzeugpreis aus in CHF", 1, 10000, 400)
-Werkzeugvebrauch = st.number_input("Wähle den jährlichen Werkzeugverbrauch aus", 1, 100, 10)
+Werkzeugvebrauch = st.number_input("Wähle den Werkzeugverbrauch aus", 1, 100, 10)
 Anzahl_zu_produzierende_Teile_max = st.number_input("Wähle die Menge der in dem Wiederbeschaffungszeitraum zu beschaffende Teile aus", 1, 2000000, Standmenge_durch*2)
 
 
@@ -63,6 +64,13 @@ for MldMenge in range(min_beta, max_beta, step_beta):
 label = min(Kosten.items(), key=operator.itemgetter(1))[0]
 MldMenge = range(min_beta, max_beta, step_beta)
 
+data = [[list(MldMenge),list(Kosten.values()),list(Stillstandskosten.values()), list(Lagerkosten.values()), list(Kapitalbindungskosten.values())]]
+
+df = pd.DataFrame(data).transpose()
+df.columns = ["Meldemenge", "Ausfallkosten", "Lagerkosten", "Kapitalbindungskosten"]
+df = df.set_index("Meldemenge")
+st.line_chart(df)
+
 fig, ax = plt.subplots(2, figsize=(6, 6), dpi=200)
 ax[0].plot(list(MldMenge), list(Kosten.values()), label="Gesamtkosten")
 ax[0].plot(list(MldMenge), list(Stillstandskosten.values()), label="Ausfallkosten")
@@ -80,7 +88,7 @@ ax[1].set_xlabel("Meldemenge")
 ax[1].set_ylabel(r"$\beta$")
 
 st.write("Die kritische Lagermenge liegt bei " + str(label) + " Stück.")
-st.write("Die erwartete Wahrscheinlichkeit eines Ausfalls innerhalbs eines Jahres ist "+"{:10.2f}".format((1 - beta[label]) * Werkzeugvebrauch * 100) + " %.")
+st.write("Die erwartete Wahrscheinlichkeit eines Ausfalls in einem Jahr ist "+"{:10.2f}".format((1 - beta[label]) * Werkzeugvebrauch * 100) + " %.")
 
 st.pyplot(fig)
 
