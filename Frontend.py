@@ -80,7 +80,7 @@ ax[1].set_xlabel("Meldemenge")
 ax[1].set_ylabel(r"$\beta$")
 
 st.write("Die kritische Lagermenge liegt bei " + str(label) + " Stück.")
-st.write("Die erwartete Wahrscheinlichkeit eines Ausfalls in einem Jahr ist "+"{:10.2f}".format((1 - beta[label]) * Werkzeugvebrauch * 100) + " %.")
+st.write("Die erwartete Wahrscheinlichkeit eines Ausfalls innerhalbs eines Jahres ist "+"{:10.2f}".format((1 - beta[label]) * Werkzeugvebrauch * 100) + " %.")
 
 st.pyplot(fig)
 
