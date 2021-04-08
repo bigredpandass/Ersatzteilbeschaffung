@@ -4,6 +4,7 @@ from scipy import stats
 import matplotlib.pyplot as plt
 import operator
 import streamlit as st
+import plotly.express as px
 
 
 
@@ -25,20 +26,23 @@ st.title("Prototyp systematisches Ersatzteilmanagement")
 Kalk_Zinssatz_jährlich = st.slider("Wähle den jährlichen kalk. Zinssatz aus in %", 0, 30, 10, 1)/100 # 10% / Jahr für Berechnung der Kapitalbindungskosten
 Kalk_Zinssatz = (Kalk_Zinssatz_jährlich +1)**(1/365) - 1 # Kalkulation des täglichen Zinssatzes
 Lagerkostensatz = st.slider("Wähle den Lagerkostensatz aus pro  Jahr pro Werkzeug Instanz in CHF", 1, 100, 20, 1)/365 # CHF pro Tags; später abhängig machen von z.B. Gewicht etc.?
-Pönale = st.number_input("Wähle die Pönale falls es zu einem Ausfall kommt in CHF ", 0, 200000, 10000)
+
 
 Standmenge_durch = st.number_input("Wähle die durchschnittliche Standmenge aus", 0, 2000000, 100000)
-Standmenge_stdv_perc= st.slider("Wähle die Standardabweichung der Standmenge in % aus:", 0, 100, 25,5)/100
-Standmenge_stdv = Standmenge_stdv_perc * Standmenge_durch
 
-Werkzeugkosten = st.number_input("Wähle den Werkzeugpreis aus in CHF", 1, 10000, 400)
+
+
 Werkzeugvebrauch = st.number_input("Wähle den Werkzeugverbrauch aus", 1, 100, 10)
 Anzahl_zu_produzierende_Teile_max = st.number_input("Wähle die Menge der in dem Wiederbeschaffungszeitraum zu beschaffende Teile aus", 1, 2000000, Standmenge_durch*2)
 
+Pönale = st.slider("Wähle die Pönale falls es zu einem Ausfall kommt in CHF ", 0, 200000, 10000, 500)
+Werkzeugkosten = st.slider("Wähle den Werkzeugpreis aus in CHF", 1, 10000, 400, 10)
+Standmenge_stdv_perc= st.slider("Wähle die Standardabweichung der Standmenge in % aus:", 0, 100, 25,5)/100
+Standmenge_stdv = Standmenge_stdv_perc * Standmenge_durch
 
 
 min_beta = math.ceil(Anzahl_zu_produzierende_Teile_max / Standmenge_durch)
-max_beta = math.ceil(Anzahl_zu_produzierende_Teile_max / Standmenge_durch) + 10
+max_beta = math.ceil(Anzahl_zu_produzierende_Teile_max / Standmenge_durch) + 20
 step_beta = 1
 
 Kosten = {}
@@ -64,39 +68,24 @@ for MldMenge in range(min_beta, max_beta, step_beta):
 label = min(Kosten.items(), key=operator.itemgetter(1))[0]
 MldMenge = range(min_beta, max_beta, step_beta)
 
-data = [[list(MldMenge),list(Kosten.values()),list(Stillstandskosten.values()), list(Lagerkosten.values()), list(Kapitalbindungskosten.values())]]
-
+data = [list(MldMenge),list(Kosten.values()),list(Stillstandskosten.values()), list(Lagerkosten.values()), list(Kapitalbindungskosten.values())]
 df = pd.DataFrame(data).transpose()
-df.columns = ["Meldemenge", "Ausfallkosten", "Lagerkosten", "Kapitalbindungskosten"]
-df = df.set_index("Meldemenge")
-st.line_chart(df)
+df.columns = ["Meldemenge","Gesamtkosten", "Ausfallkosten", "Lagerkosten", "Kapitalbindungskosten"]
 
-fig, ax = plt.subplots(2, figsize=(6, 6), dpi=200)
-ax[0].plot(list(MldMenge), list(Kosten.values()), label="Gesamtkosten")
-ax[0].plot(list(MldMenge), list(Stillstandskosten.values()), label="Ausfallkosten")
-ax[0].plot(list(MldMenge), list(Lagerkosten.values()), label="Lagerkosten")
-ax[0].plot(list(MldMenge), list(Kapitalbindungskosten.values()), label="Kapitalbindungskosten")
-ax[0].legend()
-ax[0].set_xlim(right = label+3, left = min_beta)
-ax[0].set_ylim( bottom = 0, top = min(Kosten.values())*4)
-ax[0].set_xlabel("Meldemenge")
-ax[0].set_ylabel("Kosten [CHF]")
 
-ax[1].plot(list(MldMenge), list(beta.values()), label="beta values")
-ax[1].set_xlim(right = label+3, left = min_beta)
-ax[1].set_xlabel("Meldemenge")
-ax[1].set_ylabel(r"$\beta$")
+fig2 = px.line(df, x="Meldemenge", y=["Gesamtkosten", "Ausfallkosten", "Lagerkosten", "Kapitalbindungskosten"], labels=dict(variable ="Kostenart"))
+
+fig2.update_xaxes(range=[min_beta, label+3], title_text="Meldemenge")
+fig2.update_yaxes(range=[0, min(Kosten.values())*4], title_text="Kosten [CHF]")
+fig2.update_layout(font=dict(size=16), legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="right",
+    x=0.99
+))
 
 st.write("Die kritische Lagermenge liegt bei " + str(label) + " Stück.")
 st.write("Die erwartete Wahrscheinlichkeit eines Ausfalls in einem Jahr ist "+"{:10.2f}".format((1 - beta[label]) * Werkzeugvebrauch * 100) + " %.")
+st.plotly_chart(fig2)
 
-st.pyplot(fig)
-
-
-
-
-
-
-
-# print(sum([(1-label)**x for x in range(1,n_Werkzeuge)]))
 
