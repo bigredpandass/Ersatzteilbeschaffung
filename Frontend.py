@@ -31,7 +31,7 @@ Standmenge_stdv_perc= st.slider("Wähle die Standardabweichung der Standmenge in
 Standmenge_stdv = Standmenge_stdv_perc * Standmenge_durch
 
 Werkzeugkosten = st.number_input("Wähle den Werkzeugpreis aus in CHF", 1, 10000, 400)
-Werkzeugvebrauch = st.number_input("Wähle den Werkzeugverbrauch aus", 1, 100, 10)
+Werkzeugvebrauch = st.number_input("Wähle den jährlichen Werkzeugverbrauch aus", 1, 100, 10)
 Anzahl_zu_produzierende_Teile_max = st.number_input("Wähle die Menge der in dem Wiederbeschaffungszeitraum zu beschaffende Teile aus", 1, 2000000, Standmenge_durch*2)
 
 
