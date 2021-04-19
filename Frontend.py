@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import operator
 import streamlit as st
 import plotly.express as px
-
+import numpy as np
 
 
 # ----------------- Funktionen
@@ -32,7 +32,7 @@ Standmenge_durch = st.number_input("Wähle die durchschnittliche Standmenge aus"
 
 
 
-Werkzeugvebrauch = st.number_input("Wähle den Werkzeugverbrauch aus", 1, 100, 10)
+Werkzeugvebrauch = st.number_input("Wähle den Werkzeugverbrauch aus", 1, 1000, 10)
 Anzahl_zu_produzierende_Teile_max = st.number_input("Wähle die Menge der in dem Wiederbeschaffungszeitraum zu beschaffende Teile aus", 1, 2000000, Standmenge_durch*2)
 
 Pönale = st.slider("Wähle die Pönale falls es zu einem Ausfall kommt in CHF ", 0, 200000, 10000, 500)
@@ -40,6 +40,15 @@ Werkzeugkosten = st.slider("Wähle den Werkzeugpreis aus in CHF", 1, 10000, 400,
 Standmenge_stdv_perc= st.slider("Wähle die Standardabweichung der Standmenge in % aus:", 0, 100, 25,5)/100
 Standmenge_stdv = Standmenge_stdv_perc * Standmenge_durch
 
+with st.beta_expander("Beispiel Standmengenverteilung"):
+    mu, sigma = Standmenge_durch, Standmenge_stdv
+    sample = np.random.normal(mu, sigma, Werkzeugvebrauch)
+    sample = sample.clip(min=0)
+    dfbuffer = pd.DataFrame(sample, columns=["Standmenge"])
+    st.write(dfbuffer)
+    fig3 = px.histogram(dfbuffer,nbins=20)
+    st.plotly_chart(fig3)
+st.write("\n")
 
 min_beta = math.ceil(Anzahl_zu_produzierende_Teile_max / Standmenge_durch)
 max_beta = math.ceil(Anzahl_zu_produzierende_Teile_max / Standmenge_durch) + 20
