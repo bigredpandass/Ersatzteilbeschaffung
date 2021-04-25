@@ -84,7 +84,7 @@ df.columns = ["Meldemenge","Gesamtkosten", "Ausfallkosten", "Lagerkosten", "Kapi
 
 fig2 = px.line(df, x="Meldemenge", y=["Gesamtkosten", "Ausfallkosten", "Lagerkosten", "Kapitalbindungskosten"], labels=dict(variable ="Kostenart"))
 
-fig2.update_xaxes(range=[min_beta, label+3], title_text="Meldemenge")
+fig2.update_xaxes(range=[min_beta, label+3], title_text="Lagermenge")
 fig2.update_yaxes(range=[0, min(Kosten.values())*4], title_text="Kosten [CHF]")
 fig2.update_layout(font=dict(size=16), legend=dict(
     yanchor="top",
