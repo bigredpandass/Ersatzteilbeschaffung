@@ -92,7 +92,6 @@ fig2.update_layout(font=dict(size=16), legend=dict(
     xanchor="right",
     x=0.99
 ))
-fig2.update_traces(line=dict(color="Black", width=0.5))
 
 st.write("Die kritische Lagermenge liegt bei " + str(label) + " Stück.")
 st.write("Die erwartete Wahrscheinlichkeit eines Ausfalls in einem Jahr ist "+"{:10.2f}".format((1 - beta[label]) * Werkzeugvebrauch * 100) + " %.")
